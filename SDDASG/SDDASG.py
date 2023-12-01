@@ -1,3 +1,4 @@
+from pickle import FALSE
 import random
 
 #------
@@ -56,6 +57,26 @@ def draw_field():
     return
 
 show_main_menu()
-menu_input=int(input("Your choice?? "))
+#menu_input=int(input("Your choice?? "))
+menu_ch=False
 
-draw_field()
+while True:
+    menu_input=int(input("Your choice?? "))
+    if menu_input==1:
+        #shop menu
+        draw_field()
+        while True:
+            unit_num=int(input('What unit do you wish to buy?\n'\
+                                '1.Archer (5 gold)\n'\
+                                '2.wall (3 gold)\n'\
+                                '3.Don\'t buy\n'\
+                                'Your choice?? '))
+            if unit_num!=3:
+                break
+            elif unit_num==2:
+                break
+            elif unit_num==1:
+                break
+            else:
+                print('something')
+                break
