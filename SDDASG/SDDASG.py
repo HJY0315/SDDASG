@@ -12,10 +12,23 @@ def show_main_menu():
 #------
 #Display Layout
 #------
+
+#Field now 10*6
+field = [ [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None],
+          [None, None, None, None, None, None]]
+
 def draw_field():
     num_r=len(field)
     num_c=len(field[0])
-    print(' '*3,'1',' '*3,'2',' '*3,'3')
+    #print(' '*3,'1',' '*3,'2',' '*3,'3', ' '*3,'4', ' '*3,'5', ' '*3,'6')
 
     #print top line
     print(' ',end='')
@@ -25,7 +38,8 @@ def draw_field():
 
     for r in range(num_r):
 
-        print(chr(ord('A')+r),end='')
+        #print(chr(ord('1')+r),end='')
+        print(' ', end='')
         for c in field[r]:    
             print('|{:5}'.format(' ' if c is None else c['shortform']),end='')
         print('|')
@@ -41,3 +55,7 @@ def draw_field():
         print('+')  
     return
 
+show_main_menu()
+menu_input=int(input("Your choice?? "))
+
+draw_field()
