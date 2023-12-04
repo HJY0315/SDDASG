@@ -41,7 +41,7 @@ def show_main_menu():
     print("1. Start new game")
     print("2. Load saved game")
     print("3. Display Highest Score")
-    print("3. Exit Game")
+    print("4. Exit Game")
 
 #------
 #Display Layout
@@ -163,9 +163,13 @@ while menu_ch==True:
     elif menu_input==3:
         menu_ch=False
         play_game=False
-
+        print()
+    elif menu_input==4:
+        print('BYE BYE!!!!!!!!!!!')
+        break
     else:
-        print('Please enter an valid number.')
+        print('Youe have entered an invalid number.')
+        break
 
 while play_game==True:
     draw_field()
@@ -183,12 +187,44 @@ while play_game==True:
                                 '5.Road\n'\
                                 '6.Don\'t buy\n'\
                                 'Your choice?? '))
-            if unit_num!=3:
+            if unit_num!=6:
                 break
-            elif unit_num==2:
-                break
-            elif unit_num==1:
-                break
+                if unit_num==1:
+                            break
+                        #else:
+                            #print('Not enough Coins.')
+                elif unit_num==2:
+                            break
+                        #else:
+                            #print('Not enough Coins.')
+                elif unit_num==3:
+                            break
+                        #else:
+                            #print('Not enough Coins.')
+                elif unit_num==4:
+                            break
+                        #else:
+                            #print('Not enough Coins.')
+                elif unit_num==5:
+                            break
+                        #else:
+                            #print('Not enough Coins.')
+
             else:
-                print('something')
-                break
+                print('Invalid choice.\nPlease reselect.')
+                shop_ch=False
+
+    #Turn End
+    elif menu_input==2:
+        print('Turn ended.')
+        game_vars['turn']+=1
+        break
+
+    #Save Game
+    elif menu_input==3:
+        break
+
+    #End
+    else:
+        print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
+        break
