@@ -42,16 +42,26 @@ def show_main_menu():
 #Display Layout
 #------
 
-field = [ [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None],
-          [None, None, None, None, None, None, None, None, None, None]]
+field = [ [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
 
 def draw_field():
     num_r=len(field)
