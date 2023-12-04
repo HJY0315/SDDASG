@@ -5,7 +5,7 @@ import ctypes
 
 # Game variables
 game_vars = {
-    'turn': 1, 
+    'turn': 0, 
     'Coins': 20,      
     }
 
@@ -64,33 +64,44 @@ field = [ [None, None, None, None, None, None, None, None, None, None, None, Non
           [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
 
 def draw_field():
-    num_r=len(field)
-    num_c=len(field[0])
-   
+    num_r = len(field)
+    num_c = len(field[0])
 
-    #print top line
-    print(' ',end='')
+    # print top line
+    print('  ', end='')
+    for i in range(1, num_c+1):
+        print('{:<5}'.format(i), end='')
+    
+    print('\n ', end='')
     for i in range(len(field[0])):
-        print('+-----',end='')
+        print('+----', end='')
     print('+')
 
     for r in range(num_r):
-
-        print(' ', end='')
-        for c in field[r]:    
-            print('|{:5}'.format(' ' if c is None else c['shortform']),end='')
-        print('|')
-        print(' ',end='')
+        print(chr(ord('A') + r), end='')
 
         for c in field[r]:
-            print('|{:2}{:1}{:2}'.format(' ', ' ', ' ' ),end='')
+            if c is None:
+                print('|    ', end='')  # Print empty space for None
+            elif isinstance(c, dict):
+                print('|{:4}'.format(c['shortform']), end='')  # Access 'shortform' if c is a dictionary
+            else:
+                print('|{:4}'.format(c), end='')  # Print directly if it's not a dictionary
         print('|')
-        print(' ',end='')
 
+        # Print the separator line
+        print(' ', end='')
+        for c in field[r]:
+            print('|{:4}'.format(''), end='')
+        print('|')
+
+        # Print the bottom line of each row
+        print(' ', end='')
         for c in range(num_c):
-            print('+-----',end='')
-        print('+')  
+            print('+----', end='')
+        print('+')
     return
+
 
 #-----------
 #Initializes all the game variables for a new game
@@ -106,7 +117,7 @@ def initialize_game():
 #---------
 def buy_unit(field, game_vars):
     print('What building do you wish to purchase?')
-    choice = {'1':R['name'],'2':I['name'], '2':I['name'], '3':C['name'], '4':O['name'], '5':Road['name'], '6':"Don't buy"}
+    choice = {'1':R['name'],'2':I['name'], '3':C['name'], '4':O['name'], '5':Road['name'], '6':"Don't buy"}
     print('1. {}({} gold)\n2. {}({} gold\n3. {}{} gold\n4. {}{} gold\n5. {}{} gold)\n6. {}'.format(choice['1'],R['price'],choice['2'],I['price'], choice['3'],C['price'], choice['4'],O['price'], choice['5'],Road['price'], choice['6']))
     row=ord(position[0])-ord('A')
     column=int(position[1])-1
@@ -123,24 +134,35 @@ def show_combat_menu(game_vars):
     print("3. Save game    4. Quit")
 
 #----------
-#Place building
+#Random Building
 #----------
-def placing(field, building):
-    spawn_ch=True
-    while spawn_ch==True:
-        row=random.randint(0,len(field)-1)
-        position=chr(ord('A')+row)+'7'
-        place_unit(field, position, building.copy())
-        game_vars['Coins']+=1
-        break
+buildings = [R, I, C, O, Road]
 
+def select_random_building():
+    build = random.choice(buildings)
+    build2 = random.choice(buildings)
+    print('Please choose one of the two buildings given:', build['name'], 'or', build2['name'])
+    choice = input("Enter your choice: ")
+    
+    # Ensure the user input matches one of the randomly chosen buildings
+    if choice.capitalize() == build['name'] or choice.capitalize() == build2['name']:
+        chosen_building = build if choice.capitalize() == build['name'] else build2
+        return chosen_building['shortform']
+    else:
+        print("Invalid choice. Please choose one of the two buildings.")
+        return select_random_building()
+
+
+def get_user_position():
+    position = input("Enter position (e.g., A1): ").capitalize()
+    return position
+
+def buy_unit(field, position, building):
+    row = ord(position[0]) - ord('A')
+    column = int(position[1:]) - 1
+    field[row][column] = building
     return
 
-def place_unit(field, position, unit_name):
-    row=ord(position[0])-ord('A')
-    column=int(position[1])-1
-    field[row][column]=unit_name.copy()
-    return True
 
 #---------
 #Alert Box
@@ -167,11 +189,8 @@ while menu_ch==True:
     if menu_input==1:
         menu_ch=False
         initialize_game()
-        game_vars['turn']=1
         play_game=True
-        placing(field, R)
-        placing(field, C)
-
+        
     elif menu_input==2:
         menu_ch=False
         play_game=True
@@ -189,46 +208,37 @@ while menu_ch==True:
 
 while play_game==True:
     draw_field()
-    show_combat_menu(game_vars)
-    menu_input=int(input("Your choice?? "))
-    if menu_input==1:
-        #building menu
-        building_ch=True
-        while building_ch==True:
-            unit_num=int(input('Which building would you like to construct?\n'\
-                                '1.Residential\n'\
-                                '2.Industry\n'\
-                                '3.Commercial\n'\
-                                '4.Park\n'\
-                                '5.Road\n'\
-                                '6.Don\'t buy\n'\
-                                'Your choice?? '))
-            if unit_num!=6:
-                break
-                if unit_num==1:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==2:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==3:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==4:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==5:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
 
-            else:
-                print('Invalid choice.\nPlease reselect.')
-                shop_ch=False
+    if menu_input == 1:       
+        if (game_vars['turn']<=0):
+            chosen_building = select_random_building()
+            position = get_user_position()
+            print("Building:", chosen_building)
+            print("Position:", position)
+            buy_unit(field, position, chosen_building)  
+            game_vars['turn']+=1
+
+        else:
+            while True:
+      
+                unit_num = int(input('Which building would you like to construct?\n'
+                                        '1. Residential\n'
+                                        '2. Industry\n'
+                                        '3. Commercial\n'
+                                        '4. Park\n'
+                                        '5. Road\n'
+                                        '6. Don\'t buy\n'
+                                        'Your choice?? '))
+
+                if unit_num == 6:
+                    print('You chose not to buy. Ending building selection.')
+                    break
+                elif unit_num in range(1, 6):
+                    print('You chose to build option {unit_num}.')
+                    break
+                else:
+                    print('Invalid choice.\nPlease reselect.')
+                    shop_ch = False
 
     #Turn End
     elif menu_input==2:
