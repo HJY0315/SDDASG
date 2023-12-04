@@ -103,6 +103,43 @@ def buy_unit(field, game_vars):
     field[row][column]=unit.copy()
     return
 
+
+def Sbuy_unit(field, game_vars):
+    while True:     #keep prompting for a valid input
+        try:
+            choice = int(input('Your choice? '))
+        except:
+            print('Please Enter a Number!')
+        else:
+            if choice <= 2 and choice > 0:  # A valid input, proceed to next step
+                break
+            else:   #If the input is a number but out of range #eg.5,6,7
+                print('Invalid input')
+    while True:
+        if choice == 1 or choice == 2:       # 1 for archer, 2 for wall
+            if game_vars['gold'] >= 1: 
+                position = input('Place where? ')
+                position = position.upper()
+                if len(position) == 1:      #eg 1,a,b
+                    print('Invalid input')
+                else:
+                    if int(position[1]) <= 3:
+                        result = place_unit(field, position, defender_list[choice-1]) #Modify place_unit function to receive I C to print it out
+                        if result == True:      #Placement of unit is done and gold is deducted
+                            game_vars['gold'] -= defenders[defender_list[choice-1]]['price']
+                            return True
+                        else:       #result = False which means the placement of unit is not succes
+                            print('Invalid input')
+                    else:       #eg. a5,b7
+                        print('Please put your unit on first three column')
+            else:
+                print('Insufficient gold')
+                return False     # Return to prompt input for combat menu and buy unit
+        else:       #choice == 3
+            return False
+    return
+
+
 #---------
 #Purchase building menu
 #---------
@@ -159,8 +196,6 @@ while menu_ch==True:
         initialize_game()
         game_vars['turn']=1
         play_game=True
-        placing(field, R)
-        placing(field, C)
 
     elif menu_input==2:
         menu_ch=False
@@ -174,7 +209,7 @@ while menu_ch==True:
         print('BYE BYE!!!!!!!!!!!')
         break
     else:
-        print('Youe have entered an invalid number.')
+        print('You have entered an invalid number.')
         break
 
 while play_game==True:
