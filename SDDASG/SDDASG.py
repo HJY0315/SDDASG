@@ -1,6 +1,7 @@
 from itertools import filterfalse
 from pickle import FALSE
 import random
+import ctypes
 
 # Game variables
 game_vars = {
@@ -9,30 +10,24 @@ game_vars = {
     }
 
 R = {'shortform' : 'R',
-        'name': 'Residential',
-        'Coins': 1
+        'name': 'Residential'
         }
 
 I = {'shortform': 'I',
-        'name': 'Industry',
-        'Coins': 1,
+        'name': 'Industry'
         }
 
 C = {'shortform': 'C',
-        'name': 'Commercial',
-        'Coins': 1,
+        'name': 'Commercial'
           }
 
 O = {'shortform': 'O',
-        'name': 'Park',
-        'Coins': 1,
+        'name': 'Park'
           }
 
 Road = {'shortform': '*',
-        'name': 'Road',
-        'Coins': 1,
+        'name': 'Road'
           }
-
 
 #------
 #Diplay main manu
@@ -222,9 +217,11 @@ while play_game==True:
 
     #Save Game
     elif menu_input==3:
+        ctypes.windll.user32.MessageBoxW(0,"Do You Want to Save your Game?", "", 3)
         break
 
     #End
     else:
+        ctypes.windll.user32.MessageBoxW(0, "Do You Want to Save your Game?", "", 4)
         print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
         break
