@@ -1,4 +1,4 @@
-from itertools import filterfalse
+﻿from itertools import filterfalse
 from pickle import FALSE
 import random
 import ctypes
@@ -42,7 +42,6 @@ def show_main_menu():
 #Display Layout
 #------
 
-#Field now 10*6
 field = [ [None, None, None, None, None, None, None, None, None, None],
           [None, None, None, None, None, None, None, None, None, None],
           [None, None, None, None, None, None, None, None, None, None],
@@ -113,9 +112,9 @@ def show_combat_menu(game_vars):
     print("1. Buy unit     2. End turn")
     print("3. Save game    4. Quit")
 
-#---------------------------------------------------------------------
+#----------
 #Place building
-#---------------------------------------------------------------------
+#----------
 def placing(field, building):
     spawn_ch=True
     while spawn_ch==True:
@@ -132,6 +131,18 @@ def place_unit(field, position, unit_name):
     column=int(position[1])-1
     field[row][column]=unit_name.copy()
     return True
+
+#---------
+#Alert Box
+#---------
+
+class MbConstants:
+    MB_OKCANCEL = 1
+    IDCANCEL = 2
+    IDOK = 1
+
+def mbox(message, title):
+    return ctypes.windll.user32.MessageBoxW(0,message, title, MbConstants.MB_OKCANCEL)
 
 #-----------
 #Main Menu
@@ -217,11 +228,20 @@ while play_game==True:
 
     #Save Game
     elif menu_input==3:
-        ctypes.windll.user32.MessageBoxW(0,"Do You Want to Save your Game?", "", 3)
-        break
+        #ctypes.windll.user32.MessageBoxW(0,"Do You Want to Save your Game?", "", 3)
+        rc = mbox("Do You Want to Save your Game?","title")
+        if  rc == MbConstants.IDOK:
+            print("Game Saved!")
+            print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
+            break
+        elif rc == MbConstants.IDCANCEL:
+            continue
 
     #End
     else:
-        ctypes.windll.user32.MessageBoxW(0, "Do You Want to Save your Game?", "", 4)
+        #ctypes.windll.user32.MessageBoxW(0, "Do You Want to Save your Game?", "", 4)
+        rc = mbox("Do You Want to Save your Game?","title")
+        if  rc == MbConstants.IDOK:
+            print("Game Saved!")
         print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
         break
