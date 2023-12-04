@@ -1,5 +1,38 @@
+from itertools import filterfalse
 from pickle import FALSE
 import random
+
+# Game variables
+game_vars = {
+    'turn': 1, 
+    'Coins': 20,      
+    }
+
+R = {'shortform' : 'R',
+        'name': 'Residential',
+        'Coins': 1
+        }
+
+I = {'shortform': 'I',
+        'name': 'Industry',
+        'Coins': 1,
+        }
+
+C = {'shortform': 'C',
+        'name': 'Commercial',
+        'Coins': 1,
+          }
+
+O = {'shortform': 'O',
+        'name': 'Park',
+        'Coins': 1,
+          }
+
+Road = {'shortform': '*',
+        'name': 'Road',
+        'Coins': 1,
+          }
+
 
 #------
 #Diplay main manu
@@ -15,21 +48,21 @@ def show_main_menu():
 #------
 
 #Field now 10*6
-field = [ [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None],
-          [None, None, None, None, None, None]]
+field = [ [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None]]
 
 def draw_field():
     num_r=len(field)
     num_c=len(field[0])
-    #print(' '*3,'1',' '*3,'2',' '*3,'3', ' '*3,'4', ' '*3,'5', ' '*3,'6')
+   
 
     #print top line
     print(' ',end='')
@@ -39,7 +72,6 @@ def draw_field():
 
     for r in range(num_r):
 
-        #print(chr(ord('1')+r),end='')
         print(' ', end='')
         for c in field[r]:    
             print('|{:5}'.format(' ' if c is None else c['shortform']),end='')
@@ -47,7 +79,7 @@ def draw_field():
         print(' ',end='')
 
         for c in field[r]:
-            print('|{:2}{:1}{:2}'.format(' ' if c is None else c['maxHP'] ,' ' if c is None else '/',' ' if c is None else c['maxHP']),end='')
+            print('|{:2}{:1}{:2}'.format(' ', ' ', ' ' ),end='')
         print('|')
         print(' ',end='')
 
@@ -56,20 +88,100 @@ def draw_field():
         print('+')  
     return
 
-show_main_menu()
-#menu_input=int(input("Your choice?? "))
-menu_ch=False
+#-----------
+#Initializes all the game variables for a new game
+#-----------
+def initialize_game():
+    game_vars['turn'] = 0
+    game_vars['Coins'] = 16
+    
+#thre = '-' * game_vars['turn']
 
-while True:
+#---------
+#Purchase building
+#---------
+def buy_unit(field, game_vars):
+    print('What building do you wish to purchase?')
+    choice = {'1':R['name'],'2':I['name'], '2':I['name'], '3':C['name'], '4':O['name'], '5':Road['name'], '6':"Don't buy"}
+    print('1. {}({} gold)\n2. {}({} gold\n3. {}{} gold\n4. {}{} gold\n5. {}{} gold)\n6. {}'.format(choice['1'],R['price'],choice['2'],I['price'], choice['3'],C['price'], choice['4'],O['price'], choice['5'],Road['price'], choice['6']))
+    row=ord(position[0])-ord('A')
+    column=int(position[1])-1
+    field[row][column]=unit.copy()
+    return
+
+#---------
+#Purchase building menu
+#---------
+def show_combat_menu(game_vars):
+    print('Turn {}'.format(game_vars['turn']))
+    print('Gold= {}'.format(game_vars['Coins']))
+    print("1. Buy unit     2. End turn")
+    print("3. Save game    4. Quit")
+
+#---------------------------------------------------------------------
+#Place building
+#---------------------------------------------------------------------
+def placing(field, building):
+    spawn_ch=True
+    while spawn_ch==True:
+        row=random.randint(0,len(field)-1)
+        position=chr(ord('A')+row)+'7'
+        place_unit(field, position, building.copy())
+        game_vars['Coins']+=1
+        break
+
+    return
+
+def place_unit(field, position, unit_name):
+    row=ord(position[0])-ord('A')
+    column=int(position[1])-1
+    field[row][column]=unit_name.copy()
+    return True
+
+#-----------
+#Main Menu
+#-----------
+
+show_main_menu()
+play_game=False
+menu_input=int(input("Your choice?? "))
+menu_ch=True
+
+while menu_ch==True:
+    if menu_input==1:
+        menu_ch=False
+        initialize_game()
+        game_vars['turn']=1
+        play_game=True
+        placing(field, R)
+        placing(field, C)
+
+    elif menu_input==2:
+        menu_ch=False
+        play_game=True
+
+    elif menu_input==3:
+        menu_ch=False
+        play_game=False
+
+    else:
+        print('Please enter an valid number.')
+
+while play_game==True:
+    draw_field()
+    show_combat_menu(game_vars)
     menu_input=int(input("Your choice?? "))
     if menu_input==1:
-        #shop menu
-        draw_field()
-        while True:
-            unit_num=int(input('What unit do you wish to buy?\n'\
-                                '1.Archer (5 gold)\n'\
-                                '2.wall (3 gold)\n'\
-                                '3.Don\'t buy\n'\
+        #building menu
+        building_ch=True
+        while building_ch==True:
+            unit_num=int(input('Which building would you like to construct?\n'\
+                                '1.Residential\n'\
+                                '2.Industry\n'\
+                                '3.Commercial\n'\
+                                '4.Park\n'\
+                                '5.Road\n'\
+                                '6.Don\'t buy\n'\
                                 'Your choice?? '))
             if unit_num!=3:
                 break
