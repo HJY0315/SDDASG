@@ -1,4 +1,5 @@
-﻿from itertools import filterfalse
+﻿from asyncio.windows_events import NULL
+from itertools import filterfalse
 from pickle import FALSE
 import random
 import ctypes
@@ -28,6 +29,8 @@ O = {'shortform': 'O',
 Road = {'shortform': '*',
         'name': 'Road'
           }
+
+
 
 #------
 #Diplay main manu
@@ -64,39 +67,50 @@ field = [ [None, None, None, None, None, None, None, None, None, None, None, Non
           [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
 
 def draw_field():
-    num_r=len(field)
-    num_c=len(field[0])
-   
+    num_r = len(field)
+    num_c = len(field[0])
 
-    #print top line
-    print(' ',end='')
+    # print top line
+    print('  ', end='')
+    for i in range(1, num_c+1):
+        print('{:<5}'.format(i), end='')
+    
+    print('\n ', end='')
     for i in range(len(field[0])):
-        print('+-----',end='')
+        print('+----', end='')
     print('+')
 
     for r in range(num_r):
-
-        print(' ', end='')
-        for c in field[r]:    
-            print('|{:5}'.format(' ' if c is None else c['shortform']),end='')
-        print('|')
-        print(' ',end='')
+        print(chr(ord('A') + r), end='')
 
         for c in field[r]:
-            print('|{:2}{:1}{:2}'.format(' ', ' ', ' ' ),end='')
+            if c is None:
+                print('|    ', end='')  # Print empty space for None
+            elif isinstance(c, dict):
+                print('|{:4}'.format(c['shortform']), end='')  # Access 'shortform' if c is a dictionary
+            else:
+                print('|{:4}'.format(c), end='')  # Print directly if it's not a dictionary
         print('|')
-        print(' ',end='')
 
+        # Print the separator line
+        print(' ', end='')
+        for c in field[r]:
+            print('|{:4}'.format(''), end='')
+        print('|')
+
+        # Print the bottom line of each row
+        print(' ', end='')
         for c in range(num_c):
-            print('+-----',end='')
-        print('+')  
+            print('+----', end='')
+        print('+')
     return
+
 
 #-----------
 #Initializes all the game variables for a new game
 #-----------
 def initialize_game():
-    game_vars['turn'] = 0
+    game_vars['turn'] = 1
     game_vars['Coins'] = 16
     
 #thre = '-' * game_vars['turn']
@@ -104,50 +118,25 @@ def initialize_game():
 #---------
 #Purchase building
 #---------
-def buy_unit(field, game_vars):
-    print('What building do you wish to purchase?')
-    choice = {'1':R['name'],'2':I['name'], '2':I['name'], '3':C['name'], '4':O['name'], '5':Road['name'], '6':"Don't buy"}
-    print('1. {}({} gold)\n2. {}({} gold\n3. {}{} gold\n4. {}{} gold\n5. {}{} gold)\n6. {}'.format(choice['1'],R['price'],choice['2'],I['price'], choice['3'],C['price'], choice['4'],O['price'], choice['5'],Road['price'], choice['6']))
-    row=ord(position[0])-ord('A')
-    column=int(position[1])-1
-    field[row][column]=unit.copy()
-    return
+def buy_unit(field, game_vars, position, building):
+    row = ord(position[0]) - ord('A')
+    column = int(position[1]) - 1 #position = 'A7'example
+    for b in buildings:
+        if b['shortform'] == building:
+            building = b
+            break
+    if field[row][column] == None:
+       field[row][column] = b
+       game_vars['Coins'] -= 1
+       print("Building has been built successfully")
+       if game_vars['Coins'] <= 0:
+           return "coinRunOut"  # Run out of coin after buy building
+       game_vars['turn'] += 1
+       return True  # buy successfully and still have coin left
+    else:
+        print("The position is occupied by another building, please try again")
+        return False
 
-
-def Sbuy_unit(field, game_vars):
-    while True:     #keep prompting for a valid input
-        try:
-            choice = int(input('Your choice? '))
-        except:
-            print('Please Enter a Number!')
-        else:
-            if choice <= 2 and choice > 0:  # A valid input, proceed to next step
-                break
-            else:   #If the input is a number but out of range #eg.5,6,7
-                print('Invalid input')
-    while True:
-        if choice == 1 or choice == 2:       # 1 for archer, 2 for wall
-            if game_vars['gold'] >= 1: 
-                position = input('Place where? ')
-                position = position.upper()
-                if len(position) == 1:      #eg 1,a,b
-                    print('Invalid input')
-                else:
-                    if int(position[1]) <= 3:
-                        result = place_unit(field, position, defender_list[choice-1]) #Modify place_unit function to receive I C to print it out
-                        if result == True:      #Placement of unit is done and gold is deducted
-                            game_vars['gold'] -= defenders[defender_list[choice-1]]['price']
-                            return True
-                        else:       #result = False which means the placement of unit is not succes
-                            print('Invalid input')
-                    else:       #eg. a5,b7
-                        print('Please put your unit on first three column')
-            else:
-                print('Insufficient gold')
-                return False     # Return to prompt input for combat menu and buy unit
-        else:       #choice == 3
-            return False
-    return
 
 
 #---------
@@ -155,29 +144,65 @@ def Sbuy_unit(field, game_vars):
 #---------
 def show_combat_menu(game_vars):
     print('Turn {}'.format(game_vars['turn']))
-    print('Gold= {}'.format(game_vars['Coins']))
-    print("1. Buy unit     2. End turn")
-    print("3. Save game    4. Quit")
+    print('Coins= {}'.format(game_vars['Coins']))
+    print("1. Buy unit     2. Save game")
+    print("0. Quit")
 
 #----------
-#Place building
+#Random Building
 #----------
-def placing(field, building):
-    spawn_ch=True
-    while spawn_ch==True:
-        row=random.randint(0,len(field)-1)
-        position=chr(ord('A')+row)+'7'
-        place_unit(field, position, building.copy())
-        game_vars['Coins']+=1
-        break
+buildings = [R, I, C, O, Road]
 
-    return
+def select_random_building():
 
-def place_unit(field, position, unit_name):
-    row=ord(position[0])-ord('A')
-    column=int(position[1])-1
-    field[row][column]=unit_name.copy()
-    return True
+    build = random.choice(buildings)    # If player proceed to next turn, they will have new randomly generated building option
+    build2 = random.choice(buildings)
+    while build2 == build:  #make sure that second option wont be same as first option
+        build2 = random.choice(buildings)
+
+    print('Please choose one of the two buildings given:', build['name'], 'or', build2['name'])
+    choice = input("Enter your choice: ")
+    # Ensure the user input matches one of the randomly chosen buildings
+    if choice.capitalize() == build['name'] or choice.capitalize() == build2['name']:
+        chosen_building = build if choice.capitalize() == build['name'] else build2
+        return chosen_building['shortform']
+    else:
+        print("Invalid choice. Please choose one of the two buildings.")
+        return select_random_building()
+
+
+#----------
+#Check if position have connected building
+#----------
+def is_connected(field, position):
+    row = ord(position[0]) - ord('A')
+    column = int(position[1]) - 1
+
+    # Check if any adjacent positions have a building
+    adjacent_positions = [(row - 1, column), (row + 1, column), (row, column - 1), (row, column + 1)]
+    #this will check each adjacent position and return true if there is any adjacent position which is inside the board range and have a building on it
+    for r, c in adjacent_positions: #for each row and column in adjacent position
+        if 0 <= r < len(field) and 0 <= c < len(field[0]) and field[r][c] is not None: 
+            return True
+    return False
+
+#----------
+#Get position input from user with validation
+#----------
+def get_user_position(field, game_vars):
+    while True:
+        position = input("Enter position (e.g., A1): ").capitalize()
+        if len(position) == 1:
+            print('Invalid input')
+        else:
+            if int(position[1]) <= 20 and int(position[1]) > 0 and 'A' <= position[0] <= 'T':
+                if is_connected(field, position) or game_vars['turn'] == 1:
+                    return position
+                else:
+                    print('You can only build on squares connected to existing buildings.')
+            else:
+                print('Please put your unit in the range of the board')
+
 
 #---------
 #Alert Box
@@ -204,9 +229,8 @@ while menu_ch==True:
     if menu_input==1:
         menu_ch=False
         initialize_game()
-        game_vars['turn']=1
         play_game=True
-
+        
     elif menu_input==2:
         menu_ch=False
         play_game=True
@@ -225,54 +249,25 @@ while menu_ch==True:
 while play_game==True:
     draw_field()
     show_combat_menu(game_vars)
-    menu_input=int(input("Your choice?? "))
-    if menu_input==1:
-        #building menu
-        building_ch=True
-        while building_ch==True:
-            unit_num=int(input('Which building would you like to construct?\n'\
-                                '1.Residential\n'\
-                                '2.Industry\n'\
-                                '3.Commercial\n'\
-                                '4.Park\n'\
-                                '5.Road\n'\
-                                '6.Don\'t buy\n'\
-                                'Your choice?? '))
-            if unit_num!=6:
-                break
-                if unit_num==1:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==2:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==3:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==4:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
-                elif unit_num==5:
-                            break
-                        #else:
-                            #print('Not enough Coins.')
+    in_game_menu_input = int(input('Your choice? '))
+    if in_game_menu_input == 1:       # build building
+        chosen_building = select_random_building()
+        print(chosen_building)
+        position = get_user_position(field, game_vars)
+        while position == False:   # invalid input
+            position = get_user_position(field, game_vars)
 
-            else:
-                print('Invalid choice.\nPlease reselect.')
-                shop_ch=False
-
-    #Turn End
-    elif menu_input==2:
-        print('Turn ended.')
-        game_vars['turn']+=1
-        break
+        print("Building:", chosen_building) # *
+        print("Position:", position)        # A1
+        buy_success = buy_unit(field, game_vars, position, chosen_building)  
+        if buy_success == "coinRunOut":
+            chosen_building = "Back"
+            play_game = False   # game end cos player left no coin 
+        elif buy_success == True: # player built a building successfully and the turn will end
+            chosen_building = "Back"
 
     #Save Game
-    elif menu_input==3:
+    elif menu_input==2:
         #ctypes.windll.user32.MessageBoxW(0,"Do You Want to Save your Game?", "", 3)
         rc = mbox("Do You Want to Save your Game?","title")
         if  rc == MbConstants.IDOK:
