@@ -203,7 +203,6 @@ def get_user_position(field, game_vars):
             else:
                 print('Please put your unit in the range of the board')
 
-
 #---------
 #Alert Box
 #---------
