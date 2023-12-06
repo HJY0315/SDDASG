@@ -153,12 +153,12 @@ def show_combat_menu(game_vars):
 #----------
 buildings = [R, I, C, O, Road]
 
-def select_random_building():
-
-    build = random.choice(buildings)    # If player proceed to next turn, they will have new randomly generated building option
-    build2 = random.choice(buildings)
-    while build2 == build:  #make sure that second option wont be same as first option
+def select_random_building(build=None, build2=None):
+    if build is None:
+        build = random.choice(buildings)    # If player proceed to next turn, they will have new randomly generated building option
         build2 = random.choice(buildings)
+        while build2 == build:  #make sure that second option wont be same as first option
+            build2 = random.choice(buildings)
 
     print('Please choose one of the two buildings given:', build['name'], 'or', build2['name'])
     choice = input("Enter your choice: ")
@@ -168,7 +168,7 @@ def select_random_building():
         return chosen_building['shortform']
     else:
         print("Invalid choice. Please choose one of the two buildings.")
-        return select_random_building()
+        return select_random_building(build,build2)
 
 
 #----------
@@ -192,16 +192,31 @@ def is_connected(field, position):
 def get_user_position(field, game_vars):
     while True:
         position = input("Enter position (e.g., A1): ").capitalize()
-        if len(position) == 1:
-            print('Invalid input')
+        if len(position) == 1 or not position[1].isdigit() or (len(position) == 3 and not position[2].isdigit()) or (len(position) > 3) or not (position[0].isalpha()):
+            print('Invalid input. Please try again')
         else:
-            if int(position[1]) <= 20 and int(position[1]) > 0 and 'A' <= position[0] <= 'T':
-                if is_connected(field, position) or game_vars['turn'] == 1:
-                    return position
+            if len(position) == 3:
+                if int(position[1]) == 2 and ('A' <= position[0] <= 'T') and int(position[2]) == 0:
+                    if is_connected(field, position) or game_vars['turn'] == 1:
+                        return position
+                    else:
+                        print('You can only build on squares connected to existing buildings.')
+                elif int(position[1]) == 1 and ('A' <= position[0] <= 'T'):
+                    if is_connected(field, position) or game_vars['turn'] == 1:
+                        return position
+                    else:
+                        print('You can only build on squares connected to existing buildings.')
                 else:
-                    print('You can only build on squares connected to existing buildings.')
+                    print('Please put your unit in the range of the board')
+            elif len(position) == 2:
+                if 'A' <= position[0] <= 'T':
+                    if is_connected(field, position) or game_vars['turn'] == 1:
+                        return position
+                    else:
+                        print('You can only build on squares connected to existing buildings.')
             else:
                 print('Please put your unit in the range of the board')
+
 
 #---------
 #Alert Box
@@ -304,51 +319,98 @@ def display_current_score():
 
 show_main_menu()
 play_game=False
-menu_input=int(input("Your choice?? "))
+menu_validation = False
 menu_ch=True
-
-while menu_ch==True:
-    if menu_input==1:
-        menu_ch=False
-        initialize_game()
-        play_game=True
-        
-    elif menu_input==2:
-        menu_ch=False
-        play_game=True
-
-    elif menu_input==3:
-        menu_ch=False
-        play_game=False
-        print()
-    elif menu_input==4:
-        print('BYE BYE!!!!!!!!!!!')
-        break
+while menu_validation == False:
+    validation = True   #Check the validation of input for combat menu
+    try:
+        menu_input=int(input("Your choice?? "))
+    except:         # It will keep prompt user for choice as long as his choice is invalid
+        print('Invalid input')
+        validation = False
     else:
-        print('You have entered an invalid number.')
-        break
+        if menu_input > 4:
+            print('Invalid input')
+            validation = False
+    if validation == True:
+        while menu_ch==True:
+
+            if menu_input==1:
+                menu_ch=False
+                initialize_game()
+                play_game=True
+                menu_validation = True
+        
+            elif menu_input==2:
+                menu_ch=False
+                play_game=True
+                menu_validation = True
+
+            elif menu_input==3:
+                menu_ch=False
+                play_game=False
+                print()
+                menu_validation = True
+
+            elif menu_input==4:
+                print('BYE BYE!!!!!!!!!!!')
+                menu_validation = True
+                break
+            else:
+                print('You have entered an invalid number.')
+                menu_validation = True
+                break
 
 while play_game==True:
     draw_field()
-    show_combat_menu(game_vars)
-    display_current_score()
-    
-    in_game_menu_input = int(input('Your choice? '))
-    if in_game_menu_input == 1:       # build building
-        chosen_building = select_random_building()
-        print(chosen_building)
-        position = get_user_position(field, game_vars)
-        while position == False:   # invalid input
-            position = get_user_position(field, game_vars)
+    while True:
+        show_combat_menu(game_vars)
+        display_current_score()
+        validation = True   #Check the validation of input for combat menu
+        try:
+            in_game_menu_input = int(input('Your choice? '))
+        except:         # It will keep prompt user for choice as long as his choice is invalid
+            print('Invalid input')
+            validation = False
+        else:
+            if in_game_menu_input > 2:
+                print('Invalid input')
+                validation = False
+        if validation == True:
+            if in_game_menu_input == 1:       # build building
+                chosen_building = select_random_building()
+                print(chosen_building)
+                position = get_user_position(field, game_vars)
+                while position == False:   # invalid input
+                    position = get_user_position(field, game_vars)
         
-        print("Building:", chosen_building) # *
-        print("Position:", position)        # A1
-        buy_success = buy_unit(field, game_vars, position, chosen_building)  
-        if buy_success == "coinRunOut":
-            chosen_building = "Back"
-            play_game = False   # game end cos player left no coin 
-        elif buy_success == True: # player built a building successfully and the turn will end
-            chosen_building = "Back"
+                print("Building:", chosen_building) # *
+                print("Position:", position)        # A1
+                buy_success = buy_unit(field, game_vars, position, chosen_building)  
+                if buy_success == "coinRunOut":
+                    play_game = False   # game end cos player left no coin 
+                    break
+                elif buy_success == True: # player built a building successfully and the turn will end
+                    break
+
+            # Save Game
+            elif in_game_menu_input == 2:
+                rc = mbox("Do You Want to Save your Game?", "title")
+                if rc == MbConstants.IDOK:
+                    print("Game Saved!")
+                elif rc == MbConstants.IDCANCEL:
+                    continue
+
+            # Quit
+            elif in_game_menu_input == 0:
+                rc = mbox("Do You Want to Save your Game?", "title")
+                if rc == MbConstants.IDOK:
+                    print("Game Saved!")
+                print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
+                break
+
+        else:       # repeat to prompt input for choice
+            continue
             
 # Game Over
 
@@ -360,9 +422,7 @@ while play_game:
     draw_field()
     show_combat_menu(game_vars)
     display_current_score()
-
     in_game_menu_input = int(input('Your choice? '))
-    
     if in_game_menu_input == 1:  # build building
         chosen_building = select_random_building()
         print(chosen_building)
