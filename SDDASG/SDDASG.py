@@ -322,6 +322,19 @@ def display_current_score():
     current_points = calculate_points(field)
     print(f"Current Points: {current_points}")
 
+def is_game_over():
+    if game_vars['Coins'] == 0:
+        print("Game Over! You ran out of coins.")
+        return True
+
+    for r in range(len(field)):
+        for c in range(len(field[0])):
+            if field[r][c] is None:
+                return False
+
+    print("Game Over! No empty grids left on the board.")
+    return True
+
 #-----------
 #Main Menu
 #-----------
