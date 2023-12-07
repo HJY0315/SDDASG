@@ -272,10 +272,18 @@ def calculate_residential_points(field, row, col):
 
 
 def calculate_industry_points(field, row, col):
+    adjacent_buildings = get_adjacent_buildings(field, row, col)
+    residential_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'R')
+    if residential_adjacent:
+        game_vars['Coins'] += residential_adjacent
     industry_count = sum(1 for r in range(len(field)) for c in range(len(field[0])) if field[r][c] and field[r][c]['shortform'] == 'I')
     return industry_count
 
 def calculate_commercial_points(field, row, col):
+    adjacent_buildings = get_adjacent_buildings(field, row, col)
+    residential_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'R')
+    if residential_adjacent:
+        game_vars['Coins'] += residential_adjacent
     non_road_adjacent = [building for building in get_adjacent_buildings(field, row, col) if building['shortform'] != '*']
     commercial_adjacent = sum(1 for building in non_road_adjacent if building['shortform'] == 'C')
     return commercial_adjacent
@@ -364,8 +372,8 @@ while menu_validation == False:
 while play_game==True:
     draw_field()
     while True:
-        show_combat_menu(game_vars)
         display_current_score()
+        show_combat_menu(game_vars)
         validation = True   #Check the validation of input for combat menu
         try:
             in_game_menu_input = int(input('Your choice? '))
