@@ -7,7 +7,8 @@ import ctypes
 # Game variables
 game_vars = {
     'turn': 1, 
-    'Coins': 20,      
+    'Coins': 20,
+    'points': 0,
     }
 
 R = {'shortform' : 'R',
@@ -74,36 +75,37 @@ def draw_field():
     # print top line
     print('  ', end='')
     for i in range(1, num_c+1):
-        print('{:<5}'.format(i), end='')
+        print('{:<4}'.format(i), end='')
     
     print('\n ', end='')
     for i in range(len(field[0])):
-        print('+----', end='')
+        print('+---', end='')
     print('+')
 
     for r in range(num_r):
         print(chr(ord('A') + r), end='')
 
         for c in field[r]:
-            if c is None:
-                print('|    ', end='')  # Print empty space for None
-            elif isinstance(c, dict):
-                print('|{:4}'.format(c['shortform']), end='')  # Access 'shortform' if c is a dictionary
+            if c != None:
+                print('|{:^3}'.format(c['shortform']),end = '')
             else:
-                print('|{:4}'.format(c), end='')  # Print directly if it's not a dictionary
+                print('|{:^3}'.format(' '),end = '')
         print('|')
 
-        # Print the separator line
-        print(' ', end='')
-        for c in field[r]:
-            print('|{:4}'.format(''), end='')
-        print('|')
+
 
         # Print the bottom line of each row
         print(' ', end='')
         for c in range(num_c):
-            print('+----', end='')
+            print('+---', end='')
         print('+')
+
+
+    print('  ', end='')
+    for i in range(1, num_c+1):
+        print('{:<4}'.format(i), end='')
+
+    print('\n')
     return
 
 
@@ -115,6 +117,14 @@ def initialize_game():
     game_vars['Coins'] = 16
     
 #thre = '-' * game_vars['turn']
+
+
+#-----------
+#Initializes all the game variables for a new game
+#-----------
+def show_legends():
+    print('Shortform Legends: \nR = Residential \nI = Industry \nC = Commercial \nO = Park \n* = Road\n')
+
 
 #---------
 #Purchase building
@@ -130,6 +140,12 @@ def buy_unit(field, game_vars, position, building):
        field[row][column] = b
        game_vars['Coins'] -= 1
        print("Building has been built successfully")
+       if b['shortform'] == 'I':
+           update_industry_coins(field, row,column)
+       elif b['shortform'] == 'C':
+           update_commercial_coins(field, row,column)
+       elif b['shortform'] == 'R':
+           update_residential_coins(field, row,column)
        if game_vars['Coins'] <= 0:
            return "coinRunOut"  # Run out of coin after buy building
        game_vars['turn'] += 1
@@ -273,21 +289,41 @@ def calculate_residential_points(field, row, col):
 
 
 def calculate_industry_points(field, row, col):
-    adjacent_buildings = get_adjacent_buildings(field, row, col)
-    residential_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'R')
-    if residential_adjacent:
-        game_vars['Coins'] += residential_adjacent
     industry_count = sum(1 for r in range(len(field)) for c in range(len(field[0])) if field[r][c] and field[r][c]['shortform'] == 'I')
     return industry_count
 
-def calculate_commercial_points(field, row, col):
+
+# calculate number of residential building adjacent to the industry and add coin
+def update_industry_coins(field, row, col):
     adjacent_buildings = get_adjacent_buildings(field, row, col)
     residential_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'R')
     if residential_adjacent:
         game_vars['Coins'] += residential_adjacent
+
+# check got industry adjacent to new built residential or not and add coin if have
+def update_residential_coins(field, row, col):
+    adjacent_buildings = get_adjacent_buildings(field, row, col)
+    industry_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'I')
+    if industry_adjacent:
+        game_vars['Coins'] += industry_adjacent
+    
+    commercial_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'C')
+    if commercial_adjacent:
+        game_vars['Coins'] += commercial_adjacent
+
+def calculate_commercial_points(field, row, col):
+    adjacent_buildings = get_adjacent_buildings(field, row, col)
     non_road_adjacent = [building for building in get_adjacent_buildings(field, row, col) if building['shortform'] != '*']
     commercial_adjacent = sum(1 for building in non_road_adjacent if building['shortform'] == 'C')
     return commercial_adjacent
+
+
+# calculate number of residential building adjacent to the commercial and add coin
+def update_commercial_coins(field, row, col):
+    adjacent_buildings = get_adjacent_buildings(field, row, col)
+    residential_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'R')
+    if residential_adjacent:
+        game_vars['Coins'] += residential_adjacent
 
 def calculate_park_points(field, row, col):
     adjacent_positions = [
@@ -319,8 +355,8 @@ def get_adjacent_buildings(field, row, col):
     return adjacent_buildings
 
 def display_current_score():
-    current_points = calculate_points(field)
-    print(f"Current Points: {current_points}")
+    game_vars['points'] = calculate_points(field)
+    print(f"Current Points: {game_vars['points']}")
 
 def is_game_over():
     if game_vars['Coins'] == 0:
@@ -344,6 +380,7 @@ def save_game():
         # Save game variables
         save_file.write('Coins={}\n'.format(game_vars['Coins']))
         save_file.write('turn={}\n'.format(game_vars['turn']))
+        save_file.write('points={}\n'.format(game_vars['points']))
 
     with open('save_field.txt', 'w') as save_file:
         # Save game field
@@ -355,6 +392,38 @@ def save_game():
                     )
 
     print("Game saved.")
+
+
+#-----------------------------------------
+# load_game()
+#
+#    Loads the game from 'save.txt'
+#-----------------------------------------
+def load_game(game_vars):
+    config_file = open('save_variable.txt','r')
+    for line in config_file:
+        info = line.strip('\n')
+        temp_list = info.split('=')
+        game_vars[temp_list[0]] = int(temp_list[1]) # Replace the original new data with the previous stored data
+    config_file.close()
+    fieldfile = open('save_field.txt', 'r')
+    for line in fieldfile:
+        line = line.strip('\n')
+        line_list = line.split(',')
+        if line_list[2] == '*':
+            field[int(line_list[0])][int(line_list[1])] = Road
+        elif line_list[2] == 'R':
+            field[int(line_list[0])][int(line_list[1])] = R
+        elif line_list[2] == 'I':
+            field[int(line_list[0])][int(line_list[1])] = I
+        elif line_list[2] == 'C':
+            field[int(line_list[0])][int(line_list[1])] = C
+        elif line_list[2] == 'O':
+            field[int(line_list[0])][int(line_list[1])] = O
+
+    #game_vars['turn'] -= 1      # deducted by 1 because when it start to play game, turn will increase by 1
+
+    return
 
 
 #-----------
@@ -385,6 +454,7 @@ while menu_validation == False:
                 menu_validation = True
         
             elif menu_input==2:
+                load_game(game_vars)
                 menu_ch=False
                 play_game=True
                 menu_validation = True
@@ -401,11 +471,12 @@ while menu_validation == False:
                 break
             else:
                 print('You have entered an invalid number.')
-                menu_validation = True
-                break
+                menu_ch = False
+
 
 while play_game==True:
     draw_field()
+    show_legends()
     while True:
         display_current_score()
         show_combat_menu(game_vars)
