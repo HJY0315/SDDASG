@@ -513,6 +513,50 @@ while play_game==True:
                 if rc == MbConstants.IDOK:
                     save_game()
                     print("Game Saved!")
+                    show_main_menu()
+                    play_game = False
+                    validation = True
+                    menu_validation = False
+                    menu_ch=True
+                    while menu_validation == False:
+                        validation = True   #Check the validation of input for combat menu
+                        try:
+                            menu_input=int(input("Your choice?? "))
+                        except:         # It will keep prompt user for choice as long as his choice is invalid
+                            print('Invalid input')
+                            validation = False
+                        else:
+                            if menu_input > 4:
+                                print('Invalid input')
+                                validation = False
+                        if validation == True:
+                            while menu_ch==True:
+
+                                if menu_input==1:
+                                    menu_ch=False
+                                    initialize_game()
+                                    play_game=True
+                                    menu_validation = True
+        
+                                elif menu_input==2:
+                                    menu_ch=False
+                                    play_game=True
+                                    menu_validation = True
+
+                                elif menu_input==3:
+                                    menu_ch=False
+                                    play_game=False
+                                    print()
+                                    menu_validation = True
+
+                                elif menu_input==4:
+                                    print('BYE BYE!!!!!!!!!!!')
+                                    menu_validation = True
+                                    break
+                                else:
+                                    print('You have entered an invalid number.')
+                                    menu_validation = True
+                                    break
                 elif rc == MbConstants.IDCANCEL:
                     continue
 
@@ -567,7 +611,50 @@ while play_game==True:
                                     menu_validation = True
                                     break
                 elif rc == MbConstants.IDCANCEL:
-                    continue
+                    show_main_menu()
+                    play_game = False
+                    validation = True
+                    menu_validation = False
+                    menu_ch=True
+                    while menu_validation == False:
+                        validation = True   #Check the validation of input for combat menu
+                        try:
+                            menu_input=int(input("Your choice?? "))
+                        except:         # It will keep prompt user for choice as long as his choice is invalid
+                            print('Invalid input')
+                            validation = False
+                        else:
+                            if menu_input > 4:
+                                print('Invalid input')
+                                validation = False
+                        if validation == True:
+                            while menu_ch==True:
+
+                                if menu_input==1:
+                                    menu_ch=False
+                                    initialize_game()
+                                    play_game=True
+                                    menu_validation = True
+        
+                                elif menu_input==2:
+                                    menu_ch=False
+                                    play_game=True
+                                    menu_validation = True
+
+                                elif menu_input==3:
+                                    menu_ch=False
+                                    play_game=False
+                                    print()
+                                    menu_validation = True
+
+                                elif menu_input==4:
+                                    print('BYE BYE!!!!!!!!!!!')
+                                    menu_validation = True
+                                    break
+                                else:
+                                    print('You have entered an invalid number.')
+                                    menu_validation = True
+                                    break
                
                 print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
                 break
