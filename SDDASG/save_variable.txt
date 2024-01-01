@@ -1,0 +1,3 @@
+Coins=8
+turn=12
+points=11

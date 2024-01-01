@@ -1,0 +1,11 @@
+0,0,I,Industry
+0,1,O,Park
+0,2,O,Park
+0,3,O,Park
+0,4,O,Park
+1,0,*,Road
+2,0,R,Residential
+2,1,C,Commercial
+2,2,R,Residential
+3,0,C,Commercial
+3,1,I,Industry
