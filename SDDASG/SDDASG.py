@@ -40,13 +40,12 @@ def show_main_menu():
     print("1. Start new game")
     print("2. Load saved game")
     print("3. Display Highest Score")
-    print("4. Exit Game")
+    print("0. Exit Game")
 
 
 #------
 #Display Layout
 #------
-
 field = [ [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
           [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
           [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
@@ -67,6 +66,30 @@ field = [ [None, None, None, None, None, None, None, None, None, None, None, Non
           [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
           [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
           [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
+
+def initialize_field():
+    global field
+    field = [ [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+          [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
+
 
 def draw_field():
     num_r = len(field)
@@ -131,7 +154,7 @@ def show_legends():
 #---------
 def buy_unit(field, game_vars, position, building):
     row = ord(position[0]) - ord('A')
-    column = int(position[1]) - 1 #position = 'A7'example
+    column = int(position[1:]) - 1 #position = 'A7'example
     for b in buildings:
         if b['shortform'] == building:
             building = b
@@ -177,11 +200,11 @@ def select_random_building(build=None, build2=None):
         while build2 == build:  #make sure that second option wont be same as first option
             build2 = random.choice(buildings)
 
-    print('Please choose one of the two buildings given:', build['name'], 'or', build2['name'])
+    print('Please choose one of the two buildings given:\n' + '[1] ' + build['name'] +'\n[2] ' + build2['name'])
     choice = input("Enter your choice: ")
     # Ensure the user input matches one of the randomly chosen buildings
-    if choice.capitalize() == build['name'] or choice.capitalize() == build2['name']:
-        chosen_building = build if choice.capitalize() == build['name'] else build2
+    if choice == '1' or choice == '2':
+        chosen_building = build if choice == '1' else build2
         return chosen_building['shortform']
     else:
         print("Invalid choice. Please choose one of the two buildings.")
@@ -391,8 +414,6 @@ def save_game():
                         '{},{},{},{}\n'.format(row, column, field[row][column]['shortform'], field[row][column]['name'])
                     )
 
-    print("Game saved.")
-
 
 #-----------------------------------------
 # load_game()
@@ -400,6 +421,7 @@ def save_game():
 #    Loads the game from 'save.txt'
 #-----------------------------------------
 def load_game(game_vars):
+    initialize_field()
     config_file = open('save_variable.txt','r')
     for line in config_file:
         info = line.strip('\n')
@@ -419,248 +441,123 @@ def load_game(game_vars):
         elif line_list[2] == 'C':
             field[int(line_list[0])][int(line_list[1])] = C
         elif line_list[2] == 'O':
-            field[int(line_list[0])][int(line_list[1])] = O
-
-    #game_vars['turn'] -= 1      # deducted by 1 because when it start to play game, turn will increase by 1
-
+            field[int(line_list[0])][int(line_list[1])] = O       
+                    
     return
 
 
 #-----------
 #Main Menu
 #-----------
-show_main_menu()
+running = True
+
+while running == True:
+
+    show_main_menu()
     
-menu_validation = False
-menu_ch=True
-while menu_validation == False:
-    validation = True   #Check the validation of input for combat menu
-    try:
-        menu_input=int(input("Your choice?? "))
-    except:         # It will keep prompt user for choice as long as his choice is invalid
-        print('Invalid input')
-        validation = False
-    else:
-        if menu_input > 4:
-            print('Invalid input')
-            validation = False
-    if validation == True:
-        while menu_ch==True:
-
-            if menu_input==1:
-                menu_ch=False
-                initialize_game()
-                play_game=True
-                menu_validation = True
-        
-            elif menu_input==2:
-                load_game(game_vars)
-                menu_ch=False
-                play_game=True
-                menu_validation = True
-
-            elif menu_input==3:
-                menu_ch=False
-                play_game=False
-                print()
-                menu_validation = True
-
-            elif menu_input==4:
-                print('BYE BYE!!!!!!!!!!!')
-                menu_validation = True
-                break
-            else:
-                print('You have entered an invalid number.')
-                menu_ch = False
-
-
-while play_game==True:
-    draw_field()
-    show_legends()
-    while True:
-        display_current_score()
-        show_combat_menu(game_vars)
+    menu_validation = False
+    menu_ch=True
+    while menu_validation == False:
         validation = True   #Check the validation of input for combat menu
         try:
-            in_game_menu_input = int(input('Your choice? '))
+            menu_input=int(input("Your choice?? "))
         except:         # It will keep prompt user for choice as long as his choice is invalid
             print('Invalid input')
             validation = False
         else:
-            if in_game_menu_input > 2:
+            if menu_input > 3:
                 print('Invalid input')
                 validation = False
         if validation == True:
-            if in_game_menu_input == 1:       # build building
-                chosen_building = select_random_building()
-                print(chosen_building)
-                position = get_user_position(field, game_vars)
-                while position == False:   # invalid input
+            while menu_ch==True:
+
+                if menu_input==1:
+                    menu_ch=False
+                    initialize_game()
+                    initialize_field()
+                    play_game=True
+                    menu_validation = True
+        
+                elif menu_input==2:
+                    load_game(game_vars)
+                    menu_ch=False
+                    play_game=True
+                    menu_validation = True
+
+                elif menu_input==3:
+                    menu_ch=False
+                    play_game=False
+                    print()
+                    menu_validation = True
+
+                elif menu_input==0:
+                    print('BYE BYE!!!!!!!!!!!')
+                    menu_validation = True
+                    running = False
+                    break
+                else:
+                    print('You have entered an invalid number.')
+                    menu_ch = False
+
+
+    while play_game==True:
+        draw_field()
+        show_legends()
+        while True:
+            display_current_score()
+            show_combat_menu(game_vars)
+            validation = True   #Check the validation of input for combat menu
+            try:
+                in_game_menu_input = int(input('Your choice? '))
+            except:         # It will keep prompt user for choice as long as his choice is invalid
+                print('Invalid input')
+                validation = False
+            else:
+                if in_game_menu_input > 2:
+                    print('Invalid input')
+                    validation = False
+            if validation == True:
+                if in_game_menu_input == 1:       # build building
+                    chosen_building = select_random_building()
+                    print(chosen_building)
                     position = get_user_position(field, game_vars)
+                    while position == False:   # invalid input
+                        position = get_user_position(field, game_vars)
         
-                print("Building:", chosen_building) # *
-                print("Position:", position)        # A1
-                buy_success = buy_unit(field, game_vars, position, chosen_building)  
-                if buy_success == "coinRunOut":
-                    play_game = False   # game end cos player left no coin 
-                    break
-                elif buy_success == True: # player built a building successfully and the turn will end
-                    break
+                    print("Building:", chosen_building) # *
+                    print("Position:", position)        # A1
+                    buy_success = buy_unit(field, game_vars, position, chosen_building)  
+                    if buy_success == "coinRunOut":
+                        play_game = False   # game end cos player left no coin 
+                        break
+                    elif buy_success == True: # player built a building successfully and the turn will end
+                        break
 
-            # Save Game
-            elif in_game_menu_input == 2:
-                rc = mbox("Do You Want to Save your Game?", "title")
-                if rc == MbConstants.IDOK:
-                    save_game()
-                    print("Game Saved!")
-                    show_main_menu()
-                    play_game = False
-                    validation = True
-                    menu_validation = False
-                    menu_ch=True
-                    while menu_validation == False:
-                        validation = True   #Check the validation of input for combat menu
-                        try:
-                            menu_input=int(input("Your choice?? "))
-                        except:         # It will keep prompt user for choice as long as his choice is invalid
-                            print('Invalid input')
-                            validation = False
-                        else:
-                            if menu_input > 4:
-                                print('Invalid input')
-                                validation = False
-                        if validation == True:
-                            while menu_ch==True:
+                # Save Game
+                elif in_game_menu_input == 2:
+                    rc = mbox("Do You Want to Save your Game?", "title")
+                    if rc == MbConstants.IDOK:
+                        save_game()
+                        print("Game Saved!")
 
-                                if menu_input==1:
-                                    menu_ch=False
-                                    initialize_game()
-                                    play_game=True
-                                    menu_validation = True
-        
-                                elif menu_input==2:
-                                    menu_ch=False
-                                    play_game=True
-                                    menu_validation = True
+                    elif rc == MbConstants.IDCANCEL:
+                        continue
 
-                                elif menu_input==3:
-                                    menu_ch=False
-                                    play_game=False
-                                    print()
-                                    menu_validation = True
+                # Quit
+                elif in_game_menu_input == 0:
+                    rc = mbox("Do You Want to Save your Game?", "title")
+                    if rc == MbConstants.IDOK:
+                        save_game()
+                        print("Game Saved!")
+                        play_game = False
+                        break
+                    
+                    elif rc == MbConstants.IDCANCEL:
+                        play_game = False
+                        break
 
-                                elif menu_input==4:
-                                    print('BYE BYE!!!!!!!!!!!')
-                                    menu_validation = True
-                                    break
-                                else:
-                                    print('You have entered an invalid number.')
-                                    menu_validation = True
-                                    break
-                elif rc == MbConstants.IDCANCEL:
-                    continue
-
-            # Quit
-            elif in_game_menu_input == 0:
-                rc = mbox("Do You Want to Save your Game?", "title")
-                if rc == MbConstants.IDOK:
-                    save_game()
-                    print("Game Saved!")
-                    show_main_menu()
-                    play_game = False
-                    validation = True
-                    menu_validation = False
-                    menu_ch=True
-                    while menu_validation == False:
-                        validation = True   #Check the validation of input for combat menu
-                        try:
-                            menu_input=int(input("Your choice?? "))
-                        except:         # It will keep prompt user for choice as long as his choice is invalid
-                            print('Invalid input')
-                            validation = False
-                        else:
-                            if menu_input > 4:
-                                print('Invalid input')
-                                validation = False
-                        if validation == True:
-                            while menu_ch==True:
-
-                                if menu_input==1:
-                                    menu_ch=False
-                                    initialize_game()
-                                    play_game=True
-                                    menu_validation = True
-        
-                                elif menu_input==2:
-                                    menu_ch=False
-                                    play_game=True
-                                    menu_validation = True
-
-                                elif menu_input==3:
-                                    menu_ch=False
-                                    play_game=False
-                                    print()
-                                    menu_validation = True
-
-                                elif menu_input==4:
-                                    print('BYE BYE!!!!!!!!!!!')
-                                    menu_validation = True
-                                    break
-                                else:
-                                    print('You have entered an invalid number.')
-                                    menu_validation = True
-                                    break
-                elif rc == MbConstants.IDCANCEL:
-                    show_main_menu()
-                    play_game = False
-                    validation = True
-                    menu_validation = False
-                    menu_ch=True
-                    while menu_validation == False:
-                        validation = True   #Check the validation of input for combat menu
-                        try:
-                            menu_input=int(input("Your choice?? "))
-                        except:         # It will keep prompt user for choice as long as his choice is invalid
-                            print('Invalid input')
-                            validation = False
-                        else:
-                            if menu_input > 4:
-                                print('Invalid input')
-                                validation = False
-                        if validation == True:
-                            while menu_ch==True:
-
-                                if menu_input==1:
-                                    menu_ch=False
-                                    initialize_game()
-                                    play_game=True
-                                    menu_validation = True
-        
-                                elif menu_input==2:
-                                    menu_ch=False
-                                    play_game=True
-                                    menu_validation = True
-
-                                elif menu_input==3:
-                                    menu_ch=False
-                                    play_game=False
-                                    print()
-                                    menu_validation = True
-
-                                elif menu_input==4:
-                                    print('BYE BYE!!!!!!!!!!!')
-                                    menu_validation = True
-                                    break
-                                else:
-                                    print('You have entered an invalid number.')
-                                    menu_validation = True
-                                    break
-               
-                print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
-                break
-
-        else:       # repeat to prompt input for choice
-            continue
+            else:  
+                continue
 
             
 ## Game Over
