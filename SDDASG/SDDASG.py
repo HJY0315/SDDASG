@@ -412,6 +412,70 @@ def display_final_score():
     print(f"Final Score: {game_vars['points']}")
 
 #-------------
+#leaderboard
+#-------------
+
+import sqlite3
+from datetime import datetime
+
+#store scores
+
+def store_score(field):
+    # Connect to the SQLite database (it will be created if it doesn't exist)
+    conn = sqlite3.connect('game_data.db')
+
+    # Create a cursor object to execute SQL queries
+    cursor = conn.cursor()
+    # Create the 'scores' table if it doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS scores
+                    (name TEXT, score INTEGER, date TEXT)''')
+
+
+    # Insert data into the 'scores' table
+    current_date = str(datetime.now())
+    name = input("Enter your name: ")
+    points = calculate_points(field)
+    data = (name, points, current_date)
+    cursor.execute('INSERT INTO scores (name, score, date) VALUES (?, ?, ?)', data)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+    print("Scores stored")
+
+
+#Reset leaderboard
+def reset_leaderboard():
+    conn = sqlite3.connect('game_data.db')
+
+    # Create a cursor object to execute SQL queries
+    cursor = conn.cursor()
+    cursor.execute('drop table scores')
+    conn.close()
+
+
+#print leaderboard
+
+def print_top_scores():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('game_data.db')
+    cursor = conn.cursor()
+
+    # Select the top 10 scores from the 'scores' table
+    cursor.execute('SELECT name, score, date FROM scores ORDER BY score DESC LIMIT 10')
+    top_scores = cursor.fetchall()
+
+    # Close the connection
+    conn.close()
+
+    # Display the top 10 scores
+    print(f"{'Name': <40}{'Score': <10}{'Date'}")
+    print("-" * 60)
+    for row in top_scores:
+        name, score, date = row
+        print(f"{name: <40}{score: <10}{date}")
+
+#-------------
 # save_game()
 #
 #-------------
@@ -504,7 +568,7 @@ while running == True:
                 elif menu_input==3:
                     menu_ch=False
                     play_game=False
-                    print()
+                    print_top_scores()
                     menu_validation = True
 
                 elif menu_input==4:
@@ -552,6 +616,7 @@ while running == True:
                     buy_success = buy_unit(field, game_vars, position, chosen_building)  
                     if buy_success == "coinRunOut":
                         play_game = False   # game end cos player left no coin 
+                        store_score(field)
                         break
                     elif buy_success == True: # player built a building successfully and the turn will end
                         break
@@ -580,6 +645,7 @@ while running == True:
                         break
                     
                     elif rc == MbConstants.IDCANCEL:
+                        store_score(field)
                         play_game = False
                         break
                     
@@ -596,11 +662,9 @@ while running == True:
                 else:
                     print("Invalid input. Please enter '0' to go back to the main menu.")
 
-            
-
 #-------------------
 #Score System Guide
-#-------------------       
+#-------------------  
 ## Game Over
 
 #def is_board_full(field):
