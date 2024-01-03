@@ -559,6 +559,80 @@ while running == True:
             else:  
                 continue
 
+#-------------------
+#Score System Guide
+#-------------------
+def calculate_points(field):
+  points = 0
+
+  for r in range(len(field)):
+    for c in range(len(field[0])):
+      building = field[r][c]
+
+      if building is not None:
+        if building['shortform'] == 'R':
+          points += calculate_residential_points(field, r, c)
+        elif building['shortform'] == 'I':
+          points += calculate_industry_points(field, r, c)
+        elif building['shortform'] == 'C':
+          points += calculate_commercial_points(field, r, c)
+        elif building['shortform'] == 'O':
+          points += calculate_park_points(field, r, c)
+        elif building['shortform'] == '*':
+          points += calculate_road_points(field, r)
+
+  return points
+
+def calculate_residential_points(field, row, col):
+  adjacent_buildings = get_adjacent_buildings(field, row, col)
+  industry_adjacent = any(building['shortform'] == 'I' for building in adjacent_buildings)
+  non_road_adjacent = [building for building in adjacent_buildings if building['shortform'] != '*']
+  residential_adjacent = sum(1 for building in non_road_adjacent if building['shortform'] == 'R')
+  commercial_adjacent = sum(1 for building in non_road_adjacent if building['shortform'] == 'C')
+  park_adjacent = sum(1 for building in non_road_adjacent if building['shortform'] == 'O')
+
+  if industry_adjacent:
+    return 1
+  else:
+    return residential_adjacent + 2 * park_adjacent + commercial_adjacent
+
+def calculate_industry_points(field, row, col):
+  industry_count = sum(1 for r in range(len(field)) for c in range(len(field[0])) if field[r][c] and field[r][c]['shortform'] == 'I')
+  return industry_count
+
+def update_industry_coins(field, row, col):
+  adjacent_buildings = get_adjacent_buildings(field, row, col)
+  residential_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'R')
+  game_vars['Coins'] += residential_adjacent
+
+def calculate_commercial_points(field, row, col):
+  adjacent_buildings = get_adjacent_buildings(field, row, col)
+  commercial_count = sum(1 for building in adjacent_buildings if building['shortform'] == 'C')
+  return commercial_count
+
+def update_commercial_coins(field, row, col):
+  adjacent_buildings = get_adjacent_buildings(field, row, col)
+  residential_adjacent = sum(1 for building in adjacent_buildings if building['shortform'] == 'R')
+  game_vars['Coins'] += residential_adjacent
+
+def calculate_park_points(field, row, col):
+  adjacent_park_count = sum(1 for r, c in get_adjacent_positions(row, col) if field[r][c] and field[r][c]['shortform'] == 'O')
+  return adjacent_park_count
+
+def calculate_road_points(field, row):
+  connected_roads = 1  # Start with the road itself
+  for c in range(1, len(field[0])):
+    if field[row][c] and field[row][c]['shortform'] == '*':
+      connected_roads += 1
+    else:
+      break
+  return connected_roads
+
+# Helper function to get adjacent buildings
+def get_adjacent_buildings(field, row, col):
+  adjacent_positions = get_adjacent_positions(row, col)
+  adjacent_buildings = [field[r][c] for r, c in adjacent_positions if field[r][c] is not None]
+  return adjacent_buildings
             
 ## Game Over
 
