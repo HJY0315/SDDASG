@@ -40,6 +40,7 @@ def show_main_menu():
     print("1. Start new game")
     print("2. Load saved game")
     print("3. Display Highest Score")
+    print("4. Score Rules")
     print("0. Exit Game")
 
 
@@ -148,6 +149,16 @@ def initialize_game():
 def show_legends():
     print('Shortform Legends: \nR = Residential \nI = Industry \nC = Commercial \nO = Park \n* = Road\n')
 
+#-----------
+#Score Rules
+#-----------
+def score_rules():
+    print('\nThere are 5 types of buildings: \n')
+    print('Residential (R): \nIf it is next to an industry (1), then it scores 1 point only.\nOtherwise, it scores 1 point for each adjacent residential (R) or commercial (C), \nand 2 points for each adjacent park (O).\n')
+    print('Industry (I): \nScores 1 point per industry in the city. \nEach industry generates 1 coin per residential building adjacent to it.\n')
+    print('Commercial (C): \nScores 1 point per commercial adjacent to it. \nEach commercial generates 1 coin per residential adjacent to it.\n')
+    print('Park (O): \nScores 1 point per park adjacent to it.\n')
+    print('Road (*): \nScores 1 point per connected road () in the same row.\n')
 
 #---------
 #Purchase building
@@ -186,7 +197,7 @@ def show_combat_menu(game_vars):
     print('Turn {}'.format(game_vars['turn']))
     print('Coins= {}'.format(game_vars['Coins']))
     print("1. Buy unit     2. Save game")
-    print("0. Quit")
+    print("3. Score Rules  0. Quit")
 
 #----------
 #Random Building
@@ -471,7 +482,7 @@ while running == True:
             print('Invalid input')
             validation = False
         else:
-            if menu_input > 3:
+            if menu_input > 4:
                 print('Invalid input')
                 validation = False
         if validation == True:
@@ -494,6 +505,12 @@ while running == True:
                     menu_ch=False
                     play_game=False
                     print()
+                    menu_validation = True
+
+                elif menu_input==4:
+                    menu_ch=False
+                    play_game=False
+                    score_rules()
                     menu_validation = True
 
                 elif menu_input==0:
@@ -519,7 +536,7 @@ while running == True:
                 print('Invalid input')
                 validation = False
             else:
-                if in_game_menu_input > 2:
+                if in_game_menu_input > 3:
                     print('Invalid input')
                     validation = False
             if validation == True:
@@ -548,6 +565,10 @@ while running == True:
 
                     elif rc == MbConstants.IDCANCEL:
                         continue
+
+                elif in_game_menu_input == 3:
+                    score_rules()
+                    validation == True
 
                 # Quit
                 elif in_game_menu_input == 0:
