@@ -645,7 +645,6 @@ while running == True:
                         break
                     
                     elif rc == MbConstants.IDCANCEL:
-                        store_score(field)
                         play_game = False
                         break
                     
