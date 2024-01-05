@@ -396,6 +396,7 @@ def is_game_over():
     if game_vars['Coins'] == 0:
         print("Game Over! You ran out of coins.")
         display_final_score()
+        store_score(field)
         return True
 
     for r in range(len(field)):
@@ -405,6 +406,7 @@ def is_game_over():
 
     print("Game Over! No empty grids left on the board.")
     display_final_score()
+    store_score(field)
     return True
 
 def display_final_score():
@@ -649,7 +651,7 @@ while running == True:
                     buy_success = buy_unit(field, game_vars, position, chosen_building)  
                     if buy_success == "coinRunOut":
                         play_game = False   # game end cos player left no coin 
-                        store_score(field)
+                        
                         break
                     elif buy_success == True: # player built a building successfully and the turn will end
                         break
