@@ -679,7 +679,6 @@ while running == True:
                     
                     elif rc == MbConstants.IDCANCEL:
                         play_game = False
-                        store_score(field)
                         break
                     
         if is_game_over():
@@ -695,89 +694,3 @@ while running == True:
                 else:
                     print("Invalid input. Please enter '0' to go back to the main menu.")
 
-#-------------------
-#Score System Guide
-#-------------------  
-## Game Over
-
-#def is_board_full(field):
-#    # Check if there are no empty grids on the board
-#    return all(all(cell is not None for cell in row) for row in field)
-
-#while play_game:
-#    draw_field()
-#    show_combat_menu(game_vars)
-#    display_current_score()
-#    in_game_menu_input = int(input('Your choice? '))
-#    if in_game_menu_input == 1:  # build building
-#        chosen_building = select_random_building()
-#        print(chosen_building)
-#        position = get_user_position(field, game_vars)
-#        while position == False:   # invalid input
-#            position = get_user_position(field, game_vars)
-        
-#        print("Building:", chosen_building)  # *
-#        print("Position:", position)         # A1
-#        buy_success = buy_unit(field, game_vars, position, chosen_building)  
-#        if buy_success == "coinRunOut":
-#            print("Game Over! You ran out of coins.")
-#            play_game = False  # game end because the player has no coin left
-#        elif buy_success == True:  # player built a building successfully and the turn will end
-#            chosen_building = "Back"
-
-#        # Check for game over based on no empty grids
-#        if is_board_full(field):
-#            print("Game Over! No empty grids left on the board.")
-#            play_game = False
-
-#    # Save Game
-#    elif in_game_menu_input == 2:
-#        rc = mbox("Do You Want to Save your Game?", "title")
-#        if rc == MbConstants.IDOK:
-#            print("Game Saved!")
-#        elif rc == MbConstants.IDCANCEL:
-#            continue
-
-#    # Quit
-#    elif in_game_menu_input == 0:
-#        rc = mbox("Do You Want to Save your Game?", "title")
-#        if rc == MbConstants.IDOK:
-#            print("Game Saved!")
-#        print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
-#        break
-
-#    # Check for Game Over
-#    if is_game_over(game_vars):
-#        print("Game Over! You ran out of coins.")
-#        play_game = False
-
-#    # Check for game over based on no empty grids
-#    if is_board_full(field):
-#        print("Game Over! No empty grids left on the board.")
-#        play_game = False
-
-#    #Save Game
-#    elif menu_input==2:
-#        #ctypes.windll.user32.MessageBoxW(0,"Do You Want to Save your Game?", "", 3)
-#        rc = mbox("Do You Want to Save your Game?","title")
-#        if  rc == MbConstants.IDOK:
-#            save_game()
-#            print("Game Saved!")
-#            print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
-#            break
-#        elif rc == MbConstants.IDCANCEL:
-#            continue
-
-#    #End
-#    else:
-#        #ctypes.windll.user32.MessageBoxW(0, "Do You Want to Save your Game?", "", 4)
-#        rc = mbox("Do You Want to Save your Game?","title")
-#        if  rc == MbConstants.IDOK:
-#            save_game()
-#            print("Game Saved!")            
-#        print('BYE BYE!!!!!!!!!!!!!!!!!!!!')
-#        break
-
-    
-
-    
